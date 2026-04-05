@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Codebase Profile",
+  "description": "Structured analysis of a codebase for course generation",
+  "type": "object",
+  "required": ["app", "actors", "data_flows", "file_structure"],
+  "properties": {
+    "app": {
+      "type": "object",
+      "required": ["name", "description", "tech_stack", "entry_points", "primary_user_journey"],
+      "properties": {
+        "name": { "type": "string", "description": "Human-readable app name" },
+        "description": { "type": "string", "description": "1-2 sentence plain-English description of what the app does" },
+        "tech_stack": { "type": "array", "items": { "type": "string" }, "description": "Technologies used" },
+        "entry_points": { "type": "array", "items": { "type": "string" }, "description": "Main entry point files" },
+        "primary_user_journey": { "type": "string", "description": "The main thing a user does, end-to-end" }
+      }
+    },
+    "actors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "initials", "role", "key_files"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" },
+          "name": { "type": "string" },
+          "initials": { "type": "string", "maxLength": 3 },
+          "role": { "type": "string" },
+          "key_files": { "type": "array", "items": { "type": "string" } },
+          "emoji": { "type": "string" }
+        }
+      }
+    },
+    "data_flows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "trigger", "steps"],
+        "properties": {
+          "name": { "type": "string" },
+          "trigger": { "type": "string" },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["from", "to", "action"],
+              "properties": {
+                "from": { "type": "string" },
+                "to": { "type": "string" },
+                "action": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "patterns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "description"],
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "file": { "type": "string" },
+          "why_it_matters": { "type": "string" }
+        }
+      }
+    },
+    "file_structure": {
+      "type": "object",
+      "required": ["key_directories"],
+      "properties": {
+        "description": { "type": "string" },
+        "key_directories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "purpose"],
+            "properties": {
+              "path": { "type": "string" },
+              "purpose": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "interesting_code_snippets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["file", "code", "what_it_does"],
+        "properties": {
+          "file": { "type": "string" },
+          "lines": { "type": "string" },
+          "code": { "type": "string" },
+          "what_it_does": { "type": "string" },
+          "why_interesting": { "type": "string" }
+        }
+      }
+    }
+  }
+}

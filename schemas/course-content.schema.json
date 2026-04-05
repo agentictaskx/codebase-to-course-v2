@@ -1,0 +1,432 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Course Content",
+  "description": "Structured course content for codebase-to-course-v2",
+  "type": "object",
+  "required": ["meta", "glossary", "modules"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["title", "actors"],
+      "properties": {
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "accent_color": {
+          "type": "string",
+          "enum": ["vermillion", "coral", "teal", "amber", "forest"],
+          "default": "vermillion"
+        },
+        "reading_time_minutes": { "type": "number" },
+        "actors": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "initials", "color_index"],
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "initials": { "type": "string", "maxLength": 3 },
+              "color_index": { "type": "integer", "minimum": 1, "maximum": 5 }
+            }
+          }
+        }
+      }
+    },
+    "glossary": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Map of technical term to plain-English definition"
+    },
+    "modules": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/module" }
+    }
+  },
+  "$defs": {
+    "module": {
+      "type": "object",
+      "required": ["id", "number", "title", "screens", "quiz"],
+      "properties": {
+        "id": { "type": "string" },
+        "number": { "type": "integer", "minimum": 1 },
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "metaphor_hint": { "type": "string" },
+        "reading_time_minutes": { "type": "number" },
+        "screens": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/screen" }
+        },
+        "quiz": { "$ref": "#/$defs/quiz" }
+      }
+    },
+    "screen": {
+      "type": "object",
+      "required": ["heading", "elements"],
+      "properties": {
+        "heading": { "type": "string" },
+        "elements": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/element" }
+        }
+      }
+    },
+    "element": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "prose", "translation", "chat", "flow", "callout",
+            "step_cards", "pattern_cards", "icon_rows", "file_tree",
+            "architecture", "badge_list", "layer_toggle", "spot_the_bug",
+            "diff_view", "custom_html"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "prose" } } },
+          "then": { "required": ["content"], "properties": { "content": { "type": "string" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "translation" } } },
+          "then": {
+            "required": ["file", "code_lines"],
+            "properties": {
+              "file": { "type": "string" },
+              "lines": { "type": "string" },
+              "code_lines": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": ["code", "english"],
+                  "properties": {
+                    "code": { "type": "string" },
+                    "english": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "chat" } } },
+          "then": {
+            "required": ["messages"],
+            "properties": {
+              "messages": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "object",
+                  "required": ["sender", "text"],
+                  "properties": {
+                    "sender": { "type": "string" },
+                    "text": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "flow" } } },
+          "then": {
+            "required": ["steps"],
+            "properties": {
+              "steps": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "object",
+                  "required": ["from", "to", "label"],
+                  "properties": {
+                    "from": { "type": "string" },
+                    "to": { "type": "string" },
+                    "label": { "type": "string" },
+                    "highlight": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "callout" } } },
+          "then": {
+            "required": ["variant", "title", "content"],
+            "properties": {
+              "variant": { "type": "string", "enum": ["accent", "info", "warning"] },
+              "icon": { "type": "string", "default": "💡" },
+              "title": { "type": "string" },
+              "content": { "type": "string" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "step_cards" } } },
+          "then": {
+            "required": ["steps"],
+            "properties": {
+              "steps": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "object",
+                  "required": ["title", "description"],
+                  "properties": {
+                    "title": { "type": "string" },
+                    "description": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "pattern_cards" } } },
+          "then": {
+            "required": ["cards"],
+            "properties": {
+              "cards": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": ["title", "description"],
+                  "properties": {
+                    "icon": { "type": "string" },
+                    "title": { "type": "string" },
+                    "description": { "type": "string" },
+                    "color_index": { "type": "integer", "minimum": 1, "maximum": 5 }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "icon_rows" } } },
+          "then": {
+            "required": ["items"],
+            "properties": {
+              "items": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": ["title", "description"],
+                  "properties": {
+                    "icon": { "type": "string" },
+                    "color_index": { "type": "integer" },
+                    "title": { "type": "string" },
+                    "description": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "file_tree" } } },
+          "then": {
+            "required": ["tree"],
+            "properties": {
+              "tree": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/file_tree_node" }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "architecture" } } },
+          "then": {
+            "required": ["zones"],
+            "properties": {
+              "zones": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["label", "components"],
+                  "properties": {
+                    "label": { "type": "string" },
+                    "css_class": { "type": "string" },
+                    "components": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["name", "description"],
+                        "properties": {
+                          "name": { "type": "string" },
+                          "description": { "type": "string" },
+                          "icon": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "badge_list" } } },
+          "then": {
+            "required": ["badges"],
+            "properties": {
+              "badges": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["code", "description"],
+                  "properties": {
+                    "code": { "type": "string" },
+                    "description": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "layer_toggle" } } },
+          "then": {
+            "required": ["layers"],
+            "properties": {
+              "layers": {
+                "type": "object",
+                "required": ["html"],
+                "properties": {
+                  "html": { "type": "string" },
+                  "css": { "type": "string" },
+                  "js": { "type": "string" }
+                }
+              },
+              "descriptions": {
+                "type": "object",
+                "properties": {
+                  "html": { "type": "string" },
+                  "css": { "type": "string" },
+                  "js": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "spot_the_bug" } } },
+          "then": {
+            "required": ["lines", "bug_explanation"],
+            "properties": {
+              "lines": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "object",
+                  "required": ["code", "is_bug"],
+                  "properties": {
+                    "code": { "type": "string" },
+                    "is_bug": { "type": "boolean" },
+                    "hint": { "type": "string" }
+                  }
+                }
+              },
+              "bug_explanation": { "type": "string" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "diff_view" } } },
+          "then": {
+            "required": ["description", "before", "after"],
+            "properties": {
+              "description": { "type": "string" },
+              "before": {
+                "type": "object",
+                "required": ["code"],
+                "properties": {
+                  "file": { "type": "string" },
+                  "code": { "type": "string" }
+                }
+              },
+              "after": {
+                "type": "object",
+                "required": ["code"],
+                "properties": {
+                  "file": { "type": "string" },
+                  "code": { "type": "string" }
+                }
+              },
+              "highlight_lines": { "type": "array", "items": { "type": "integer" } }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "custom_html" } } },
+          "then": { "required": ["html"], "properties": { "html": { "type": "string" } } }
+        }
+      ]
+    },
+    "quiz": {
+      "type": "object",
+      "required": ["questions"],
+      "properties": {
+        "questions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["type", "question", "options", "correct", "explanations"],
+            "properties": {
+              "type": { "type": "string", "enum": ["multiple_choice", "scenario"] },
+              "scenario_context": { "type": "string" },
+              "question": { "type": "string" },
+              "options": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "object",
+                  "required": ["id", "text"],
+                  "properties": {
+                    "id": { "type": "string" },
+                    "text": { "type": "string" }
+                  }
+                }
+              },
+              "correct": { "type": "string" },
+              "explanations": {
+                "type": "object",
+                "required": ["correct"],
+                "properties": {
+                  "correct": { "type": "string" }
+                },
+                "additionalProperties": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "file_tree_node": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "type": { "type": "string", "enum": ["folder", "file"], "default": "file" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/file_tree_node" }
+        }
+      }
+    }
+  }
+}

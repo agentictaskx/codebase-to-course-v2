@@ -1,0 +1,236 @@
+{
+  "meta": {
+    "title": "How Todo App Works",
+    "subtitle": "A behind-the-scenes tour of a simple task manager",
+    "accent_color": "teal",
+    "reading_time_minutes": 12,
+    "actors": [
+      { "id": "frontend", "name": "Frontend (React)", "initials": "FE", "color_index": 1 },
+      { "id": "api", "name": "API Server", "initials": "API", "color_index": 2 },
+      { "id": "database", "name": "Database", "initials": "DB", "color_index": 3 }
+    ]
+  },
+  "glossary": {
+    "API": "A way for two programs to talk to each other — like a waiter who takes your order to the kitchen and brings back food.",
+    "React": "A JavaScript library for building user interfaces. It lets you create reusable UI components — like LEGO bricks for web pages.",
+    "component": "A reusable piece of a user interface — like a single LEGO brick that can be combined with others to build something bigger.",
+    "database": "A structured place to store data permanently — like a filing cabinet that remembers everything even when you turn the computer off.",
+    "endpoint": "A specific URL that an API listens on — like a specific counter at a post office for different services.",
+    "JSON": "A text format for structured data — like a form with labeled fields that both humans and computers can read.",
+    "state": "Data that a component remembers between renders — like a whiteboard that keeps notes until you erase them.",
+    "fetch": "A built-in browser function to make network requests — like sending a letter and waiting for a reply."
+  },
+  "modules": [
+    {
+      "id": "module-1",
+      "number": 1,
+      "title": "What Happens When You Add a Todo",
+      "subtitle": "Tracing your first click through the code",
+      "reading_time_minutes": 4,
+      "screens": [
+        {
+          "heading": "The Journey Begins",
+          "elements": [
+            {
+              "type": "prose",
+              "content": "<p>You type \"Buy groceries\" and press Enter. Half a second later, it appears in your list. <strong>But what happened in that half second?</strong></p>"
+            },
+            {
+              "type": "step_cards",
+              "steps": [
+                { "title": "Text captured", "description": "The frontend grabs what you typed from the input field" },
+                { "title": "Request sent", "description": "A message flies to the API server with your todo text" },
+                { "title": "Saved to database", "description": "The server stores your todo permanently" },
+                { "title": "List updates", "description": "The frontend adds the new todo to your screen" }
+              ]
+            }
+          ]
+        },
+        {
+          "heading": "Inside the Click",
+          "elements": [
+            {
+              "type": "translation",
+              "file": "src/components/TodoInput.tsx",
+              "lines": "14-20",
+              "code_lines": [
+                { "code": "const handleSubmit = async (e) => {", "english": "When the user submits the form, this function runs..." },
+                { "code": "  e.preventDefault();", "english": "Stop the page from refreshing (default browser behavior we don't want)..." },
+                { "code": "  const res = await fetch('/api/todos', {", "english": "Send a message to our server's todo endpoint and wait for the reply..." },
+                { "code": "    method: 'POST',", "english": "We're creating something new (POST), not just reading (GET)..." },
+                { "code": "    body: JSON.stringify({ text: inputValue })", "english": "Package the todo text as JSON so the server can understand it..." },
+                { "code": "  });", "english": "End of the request — now we wait for the server to respond..." }
+              ]
+            },
+            {
+              "type": "callout",
+              "variant": "accent",
+              "icon": "💡",
+              "title": "The Client-Server Dance",
+              "content": "Every web app has this same two-step: the <em>frontend</em> (what you see) sends messages to the <em>backend</em> (a server you don't see). Understanding this split is the single most important concept for steering AI coding tools."
+            }
+          ]
+        },
+        {
+          "heading": "The Components Talk",
+          "elements": [
+            {
+              "type": "chat",
+              "messages": [
+                { "sender": "frontend", "text": "Hey API! The user wants to add a new todo: 'Buy groceries'" },
+                { "sender": "api", "text": "Got it! Let me save that to the database..." },
+                { "sender": "api", "text": "Database, please store this new todo with text 'Buy groceries'" },
+                { "sender": "database", "text": "Saved! Here's the new todo with ID #42 and a timestamp." },
+                { "sender": "api", "text": "Frontend, here's the confirmation — todo #42 is saved!" },
+                { "sender": "frontend", "text": "Thanks! Adding it to the list now. 🎉" }
+              ]
+            }
+          ]
+        }
+      ],
+      "quiz": {
+        "questions": [
+          {
+            "type": "multiple_choice",
+            "question": "You want to add a 'due date' field to todos. The user picks a date and it should be saved. Where does the saving happen?",
+            "options": [
+              { "id": "a", "text": "In the React component, right where the date picker is" },
+              { "id": "b", "text": "In the API server, which then stores it in the database" },
+              { "id": "c", "text": "Directly in the database, bypassing the server" }
+            ],
+            "correct": "b",
+            "explanations": {
+              "correct": "Exactly! The frontend collects the date, sends it to the API, and the API saves it to the database — just like the todo text flow you just learned.",
+              "a": "Not quite — the frontend handles what the user sees, but saving data goes through the API server first. Think of the server as a security guard for the database.",
+              "c": "The frontend never talks directly to the database — that would be like customers walking into the bank vault. The API server is the middleman."
+            }
+          },
+          {
+            "type": "scenario",
+            "scenario_context": "A user reports that new todos disappear after refreshing the page. They can add todos and see them in the list, but after a page refresh they're gone.",
+            "question": "Based on what you learned, where would you look first to debug this?",
+            "options": [
+              { "id": "a", "text": "The React component — maybe it's not sending the request" },
+              { "id": "b", "text": "The API endpoint — maybe it's not saving to the database" },
+              { "id": "c", "text": "The CSS styles — maybe the todos are hidden" }
+            ],
+            "correct": "b",
+            "explanations": {
+              "correct": "Great debugging instinct! If todos appear but don't survive a refresh, the frontend is working (it shows the todo) but the data isn't being persisted. The API-to-database connection is the most likely culprit.",
+              "a": "Close, but if the todo appears in the list, the frontend is at least partially working. The issue is that data doesn't persist across refreshes — that points to the save/load cycle, not the UI.",
+              "c": "If the CSS were hiding them, they'd be hidden immediately — not just after a refresh. This is a data persistence issue, not a display issue."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "module-2",
+      "number": 2,
+      "title": "Meet the Cast",
+      "subtitle": "The three players that make your todo app work",
+      "reading_time_minutes": 3,
+      "screens": [
+        {
+          "heading": "Three Actors, One Stage",
+          "elements": [
+            {
+              "type": "prose",
+              "content": "<p>Think of your todo app like a <strong>postal system</strong>. There's a front desk (where you drop off mail), a sorting facility (that processes it), and a warehouse (that stores it). Each has a distinct job.</p>"
+            },
+            {
+              "type": "icon_rows",
+              "items": [
+                { "icon": "🖥️", "color_index": 1, "title": "Frontend (React)", "description": "The front desk — what you see and interact with" },
+                { "icon": "⚡", "color_index": 2, "title": "API Server", "description": "The sorting facility — processes requests and enforces rules" },
+                { "icon": "🗄️", "color_index": 3, "title": "Database", "description": "The warehouse — stores everything permanently" }
+              ]
+            }
+          ]
+        },
+        {
+          "heading": "Where Things Live",
+          "elements": [
+            {
+              "type": "file_tree",
+              "tree": [
+                {
+                  "name": "src/",
+                  "type": "folder",
+                  "description": "All source code lives here",
+                  "children": [
+                    {
+                      "name": "components/",
+                      "type": "folder",
+                      "description": "Reusable UI building blocks",
+                      "children": [
+                        { "name": "TodoInput.tsx", "description": "The text input where you type todos" },
+                        { "name": "TodoList.tsx", "description": "The list that shows all your todos" },
+                        { "name": "TodoItem.tsx", "description": "A single todo with checkbox and delete button" }
+                      ]
+                    },
+                    {
+                      "name": "api/",
+                      "type": "folder",
+                      "description": "Server-side endpoints",
+                      "children": [
+                        { "name": "todos.ts", "description": "Handles create, read, update, delete for todos" }
+                      ]
+                    }
+                  ]
+                },
+                { "name": "database.sqlite", "description": "Where all your todos are stored permanently" }
+              ]
+            }
+          ]
+        },
+        {
+          "heading": "The Data Highway",
+          "elements": [
+            {
+              "type": "flow",
+              "steps": [
+                { "from": "frontend", "to": "api", "label": "User clicks 'Add' → Frontend sends the todo text to the API", "highlight": "frontend" },
+                { "from": "api", "to": "database", "label": "API validates the data and sends a 'save' command to the database", "highlight": "api" },
+                { "from": "database", "to": "api", "label": "Database confirms it saved the todo and returns the new record", "highlight": "database" },
+                { "from": "api", "to": "frontend", "label": "API sends the saved todo back to the frontend for display", "highlight": "api" },
+                { "from": "frontend", "to": "frontend", "label": "Frontend adds the new todo to the list — you see it appear!", "highlight": "frontend" }
+              ]
+            },
+            {
+              "type": "translation",
+              "file": "src/api/todos.ts",
+              "lines": "8-14",
+              "code_lines": [
+                { "code": "app.post('/api/todos', async (req, res) => {", "english": "When someone sends a new todo to this address, run this code..." },
+                { "code": "  const { text } = req.body;", "english": "Unpack the todo text from the incoming message..." },
+                { "code": "  const todo = await db.create({ text, done: false });", "english": "Save it to the database with 'done' set to false (it's new!)..." },
+                { "code": "  res.json(todo);", "english": "Send the saved todo back as the reply..." },
+                { "code": "});", "english": "End of the handler." }
+              ]
+            }
+          ]
+        }
+      ],
+      "quiz": {
+        "questions": [
+          {
+            "type": "multiple_choice",
+            "question": "You want to add a 'search todos' feature. Users type in a search box and see matching todos. Which files would you need to change?",
+            "options": [
+              { "id": "a", "text": "Only TodoList.tsx — filter the existing list in the frontend" },
+              { "id": "b", "text": "TodoList.tsx for the search UI + todos.ts for a new search endpoint" },
+              { "id": "c", "text": "Only todos.ts — add a search endpoint and the frontend will automatically use it" }
+            ],
+            "correct": "b",
+            "explanations": {
+              "correct": "Right! You'd need a search box in the frontend (TodoList.tsx) AND a way for the server to filter todos (todos.ts). Both sides of the client-server dance need updating.",
+              "a": "You could filter in the frontend for small lists, but for a proper search feature with many todos, you'd want the server to do the filtering — it's much faster with a database.",
+              "c": "The frontend doesn't automatically know about new API endpoints — you'd need to add UI for typing the search query and code to call the new endpoint."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

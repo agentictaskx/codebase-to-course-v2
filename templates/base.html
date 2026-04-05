@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" data-accent="{{accent_color}}" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400;1,9..40,500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  {{styles_placeholder}}
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="Course navigation">
+    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="nav-inner">
+      <button class="sidebar-toggle" aria-label="Toggle navigation sidebar" aria-expanded="false">☰</button>
+      <span class="nav-title">{{title}}</span>
+      <div class="nav-controls">
+        <span class="reading-time">{{reading_time}} min read</span>
+        <div class="nav-dots" role="tablist" aria-label="Module navigation">
+          {{nav_dots}}
+        </div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" role="complementary" aria-label="Course outline">
+    {{sidebar_content}}
+  </aside>
+
+  <!-- Course Modules -->
+  <main>
+    {{modules_content}}
+  </main>
+
+  {{scripts_placeholder}}
+</body>
+</html>
